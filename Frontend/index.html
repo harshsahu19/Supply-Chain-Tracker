@@ -1,1 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supply Chain Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚚 Supply Chain Tracker</h1>
+            <p>Track your products through the entire supply chain with blockchain transparency</p>
+            <div class="connection-status">
+                <span id="connectionStatus">Not Connected</span>
+                <button id="connectWallet" class="btn btn-primary">Connect Wallet</button>
+            </div>
+        </header>
 
+        <main>
+            <!-- Contract Info Section -->
+            <section class="info-section">
+                <div class="info-card">
+                    <h3>📊 Contract Statistics</h3>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Products:</span>
+                            <span id="totalProducts" class="stat-value">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Connected Account:</span>
+                            <span id="currentAccount" class="stat-value">Not Connected</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Create Product Section -->
+            <section class="function-section">
+                <div class="function-card">
+                    <h3>📦 Create New Product</h3>
+                    <form id="createProductForm">
+                        <div class="input-group">
+                            <label for="productName">Product Name:</label>
+                            <input type="text" id="productName" placeholder="Enter product name" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="initialLocation">Initial Location:</label>
+                            <input type="text" id="initialLocation" placeholder="Enter manufacturing location" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">Create Product</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Transfer Product Section -->
+            <section class="function-section">
+                <div class="function-card">
+                    <h3>🔄 Transfer Product</h3>
+                    <form id="transferProductForm">
+                        <div class="input-group">
+                            <label for="transferProductId">Product ID:</label>
+                            <input type="number" id="transferProductId" placeholder="Enter product ID" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="newOwnerAddress">New Owner Address:</label>
+                            <input type="text" id="newOwnerAddress" placeholder="Enter new owner's wallet address" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="newLocation">New Location:</label>
+                            <input type="text" id="newLocation" placeholder="Enter new location" required>
+                        </div>
+                        <button type="submit" class="btn btn-warning">Transfer Product</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Update Status Section -->
+            <section class="function-section">
+                <div class="function-card">
+                    <h3>📋 Update Product Status</h3>
+                    <form id="updateStatusForm">
+                        <div class="input-group">
+                            <label for="statusProductId">Product ID:</label>
+                            <input type="number" id="statusProductId" placeholder="Enter product ID" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="newStatus">Status:</label>
+                            <select id="newStatus" required>
+                                <option value="">Select status</option>
+                                <option value="manufactured">Manufactured</option>
+                                <option value="shipped">Shipped</option>
+                                <option value="in-transit">In Transit</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="sold">Sold</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="statusLocation">Current Location:</label>
+                            <input type="text" id="statusLocation" placeholder="Enter current location" required>
+                        </div>
+                        <button type="submit" class="btn btn-info">Update Status</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Product Lookup Section -->
+            <section class="function-section">
+                <div class="function-card">
+                    <h3>🔍 Track Product</h3>
+                    <form id="trackProductForm">
+                        <div class="input-group">
+                            <label for="trackProductId">Product ID:</label>
+                            <input type="number" id="trackProductId" placeholder="Enter product ID to track" required>
+                        </div>
+                        <button type="submit" class="btn btn-secondary">Track Product</button>
+                    </form>
+                    
+                    <!-- Product Details Display -->
+                    <div id="productDetails" class="product-details" style="display: none;">
+                        <h4>Product Information</h4>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <span class="detail-label">ID:</span>
+                                <span id="detailId" class="detail-value">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Name:</span>
+                                <span id="detailName" class="detail-value">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Status:</span>
+                                <span id="detailStatus" class="detail-value">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Current Location:</span>
+                                <span id="detailLocation" class="detail-value">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Current Owner:</span>
+                                <span id="detailOwner" class="detail-value">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Last Updated:</span>
+                                <span id="detailTimestamp" class="detail-value">-</span>
+                            </div>
+                        </div>
+                        
+                        <div class="history-section">
+                            <h5>📍 Location History</h5>
+                            <div id="locationHistory" class="history-list"></div>
+                            
+                            <h5>👥 Ownership History</h5>
+                            <div id="ownershipHistory" class="history-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Transaction History -->
+            <section class="function-section">
+                <div class="function-card">
+                    <h3>📜 Recent Transactions</h3>
+                    <div id="transactionHistory" class="transaction-history">
+                        <p class="no-transactions">No transactions yet. Start by creating or tracking a product!</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Processing transaction...</p>
+            </div>
+        </div>
+
+        <!-- Notification System -->
+        <div id="notification" class="notification" style="display: none;">
+            <span class="notification-message"></span>
+            <button class="notification-close">&times;</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
